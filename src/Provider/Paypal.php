@@ -177,7 +177,7 @@ class Paypal implements ProviderInterface
     }
 
     /**
-     * @param \PayPal\Api\\Payment $payment
+     * @param \PayPal\Api\Payment $payment
      * @return integer
      */
     private function getTransactionStatus(Api\Payment $payment)
