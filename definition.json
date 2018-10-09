@@ -1,0 +1,8 @@
+{
+  "connectionClass": [
+    "Fusio\\Adapter\\Paypal\\Connection\\Paypal"
+  ],
+  "paymentClass": [
+    "Fusio\\Adapter\\Paypal\\Provider\\Paypal"
+  ]
+}
