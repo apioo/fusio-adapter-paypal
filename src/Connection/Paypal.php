@@ -59,22 +59,21 @@ class Paypal implements ConnectionInterface
             'mode' => $config->get('mode'),
         ];
 
-        $logFile  = $config->get('log_file');
-        $logLevel = $config->get('log_level');
-        if (!empty($logFile) && !empty($logLevel)) {
-            $params['log.LogEnabled'] = true;
-            $params['log.FileName'] = $logFile;
-            $params['log.LogLevel'] = $logLevel;
-        }
-
         if (defined('PSX_PATH_CACHE')) {
             $cacheDir = PSX_PATH_CACHE;
         } else {
             $cacheDir = sys_get_temp_dir();
         }
 
+        $logLevel = $config->get('log_level');
+        if (!empty($logLevel) && $logLevel != 'NONE') {
+            $params['log.LogEnabled'] = true;
+            $params['log.FileName'] = $cacheDir . '/paypal.log';
+            $params['log.LogLevel'] = $logLevel;
+        }
+
         $params['cache.enabled'] = true;
-        $params['cache.FileName'] = $cacheDir;
+        $params['cache.FileName'] = $cacheDir . '/paypal.cache';
 
         $apiContext->setConfig($params);
 
@@ -89,6 +88,7 @@ class Paypal implements ConnectionInterface
         ];
 
         $levels = [
+            'NONE'    => 'NONE',
             'DEBUG'   => 'DEBUG',
             'INFO'    => 'INFO',
             'WARNING' => 'WARNING',
@@ -98,7 +98,6 @@ class Paypal implements ConnectionInterface
         $builder->add($elementFactory->newSelect('mode', 'Mode', $modes, 'PayPal provides live and a sandbox environments for API calls. The live environment moves real money while the sandbox environment allows you to test your application with mock money before you go live.'));
         $builder->add($elementFactory->newInput('client_id', 'Client ID', 'text', 'Client id obtained from the developer portal'));
         $builder->add($elementFactory->newInput('client_secret', 'Client Secret', 'text', 'Client secret obtained from the developer portal'));
-        $builder->add($elementFactory->newInput('log_file', 'Log file', 'text', 'When using a relative path, the log file is created relative to the .php file that is the entry point for this request. You can also provide an absolute path here'));
-        $builder->add($elementFactory->newSelect('log_level', 'Log level', $levels, 'text', 'Logging level options are based on mode on which SDK is running'));
+        $builder->add($elementFactory->newSelect('log_level', 'Log level', $levels, 'Logging level options are based on mode on which SDK is running'));
     }
 }
