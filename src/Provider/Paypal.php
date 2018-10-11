@@ -72,13 +72,7 @@ class Paypal implements ProviderInterface
     {
         $apiContext = $this->getApiContext($connection);
 
-        $success = $parameters['success'] ?? null;
-        $payerId = $parameters['payerId'] ?? null;
-
-        if ($success !== 'true') {
-            throw new StatusCode\BadRequestException('Payment was not successful');
-        }
-
+        $payerId   = $parameters['PayerID'] ?? null;
         $execution = $this->createPaymentExecution($payerId, $product->getPrice());
 
         // execute payment
