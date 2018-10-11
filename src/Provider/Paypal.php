@@ -63,7 +63,7 @@ class Paypal implements ProviderInterface
     {
         $apiContext = $this->getApiContext($connection);
 
-        $payerId   = $parameters['PayerID'] ?? null;
+        $payerId   = $parameters->get('PayerID');
         $execution = $this->createPaymentExecution($payerId, $product->getPrice());
 
         // execute payment
