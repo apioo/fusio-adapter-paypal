@@ -23,8 +23,9 @@ namespace Fusio\Adapter\Paypal\Provider;
 
 use Fusio\Engine\Model\ProductInterface;
 use Fusio\Engine\Model\TransactionInterface;
+use Fusio\Engine\ParametersInterface;
+use Fusio\Engine\Payment\PrepareContext;
 use Fusio\Engine\Payment\ProviderInterface;
-use Fusio\Engine\Payment\RedirectUrls;
 use PayPal\Api;
 use PayPal\Rest\ApiContext;
 use PSX\Http\Exception as StatusCode;
@@ -39,24 +40,14 @@ use PSX\Http\Exception as StatusCode;
 class Paypal implements ProviderInterface
 {
     /**
-     * @var string
-     */
-    protected $currency;
-
-    public function __construct()
-    {
-        $this->currency = 'EUR';
-    }
-
-    /**
      * @inheritdoc
      */
-    public function prepare($connection, ProductInterface $product, TransactionInterface $transaction, RedirectUrls $redirectUrls)
+    public function prepare($connection, ProductInterface $product, TransactionInterface $transaction, PrepareContext $context)
     {
         $apiContext = $this->getApiContext($connection);
 
         // create payment
-        $payment = $this->createPayment($product, $redirectUrls->getReturnUrl(), $redirectUrls->getCancelUrl());
+        $payment = $this->createPayment($product, $context);
         $payment->create($apiContext);
 
         // update transaction details
@@ -68,7 +59,7 @@ class Paypal implements ProviderInterface
     /**
      * @inheritdoc
      */
-    public function execute($connection, ProductInterface $product, TransactionInterface $transaction, array $parameters)
+    public function execute($connection, ProductInterface $product, TransactionInterface $transaction, ParametersInterface $parameters)
     {
         $apiContext = $this->getApiContext($connection);
 
@@ -119,18 +110,17 @@ class Paypal implements ProviderInterface
 
     /**
      * @param \Fusio\Engine\Model\ProductInterface $product
-     * @param string $returnUrl
-     * @param string $cancelUrl
+     * @param \Fusio\Engine\Payment\PrepareContext $context
      * @return \PayPal\Api\Payment
      */
-    private function createPayment(ProductInterface $product, $returnUrl, $cancelUrl)
+    private function createPayment(ProductInterface $product, PrepareContext $context)
     {
         $payer = new Api\Payer();
         $payer->setPaymentMethod('paypal');
 
         $item = new Api\Item();
         $item->setName($product->getName())
-            ->setCurrency($this->currency)
+            ->setCurrency($context->getCurrency())
             ->setQuantity(1)
             ->setSku($product->getId())
             ->setPrice($product->getPrice());
@@ -148,8 +138,8 @@ class Paypal implements ProviderInterface
             ->setInvoiceNumber(uniqid());
 
         $redirectUrls = new Api\RedirectUrls();
-        $redirectUrls->setReturnUrl($returnUrl)
-            ->setCancelUrl($cancelUrl);
+        $redirectUrls->setReturnUrl($context->getReturnUrl())
+            ->setCancelUrl($context->getCancelUrl());
 
         $payment = new Api\Payment();
         $payment->setIntent('sale')
