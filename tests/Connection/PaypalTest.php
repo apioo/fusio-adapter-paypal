@@ -67,11 +67,10 @@ class PaypalTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Container::class, $builder->getForm());
 
         $elements = $builder->getForm()->getProperty('element');
-        $this->assertEquals(5, count($elements));
+        $this->assertEquals(4, count($elements));
         $this->assertInstanceOf(Select::class, $elements[0]);
         $this->assertInstanceOf(Input::class, $elements[1]);
         $this->assertInstanceOf(Input::class, $elements[2]);
-        $this->assertInstanceOf(Input::class, $elements[3]);
-        $this->assertInstanceOf(Select::class, $elements[4]);
+        $this->assertInstanceOf(Select::class, $elements[3]);
     }
 }
