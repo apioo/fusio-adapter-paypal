@@ -64,7 +64,8 @@ class Paypal implements ProviderInterface
         $apiContext = $this->getApiContext($connection);
 
         $payerId   = $parameters->get('PayerID');
-        $execution = $this->createPaymentExecution($payerId, $product->getPrice());
+        $execution = new Api\PaymentExecution();
+        $execution->setPayerId($payerId);
 
         // execute payment
         $payment = Api\Payment::get($transaction->getRemoteId(), $apiContext);
@@ -88,27 +89,6 @@ class Paypal implements ProviderInterface
     }
 
     /**
-     * @param string $payerId
-     * @param float $total
-     * @return \PayPal\Api\PaymentExecution
-     */
-    private function createPaymentExecution($payerId, $total)
-    {
-        $amount = new Api\Amount();
-        $amount->setCurrency($this->currency);
-        $amount->setTotal($total);
-
-        $transaction = new Api\Transaction();
-        $transaction->setAmount($amount);
-
-        $execution = new Api\PaymentExecution();
-        $execution->setPayerId($payerId);
-        $execution->addTransaction($transaction);
-
-        return $execution;
-    }
-
-    /**
      * @param \Fusio\Engine\Model\ProductInterface $product
      * @param \Fusio\Engine\Payment\PrepareContext $context
      * @return \PayPal\Api\Payment
@@ -129,13 +109,12 @@ class Paypal implements ProviderInterface
         $itemList->setItems([$item]);
 
         $amount = new Api\Amount();
-        $amount->setCurrency($this->currency)
+        $amount->setCurrency($context->getCurrency())
             ->setTotal($product->getPrice());
 
         $transaction = new Api\Transaction();
         $transaction->setAmount($amount)
-            ->setItemList($itemList)
-            ->setInvoiceNumber(uniqid());
+            ->setItemList($itemList);
 
         $redirectUrls = new Api\RedirectUrls();
         $redirectUrls->setReturnUrl($context->getReturnUrl())
