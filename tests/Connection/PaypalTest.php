@@ -29,6 +29,7 @@ use Fusio\Engine\Form\Element\Select;
 use Fusio\Engine\Parameters;
 use Fusio\Engine\Test\EngineTestCaseTrait;
 use PayPal\Rest\ApiContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * PaypalTest
@@ -37,7 +38,7 @@ use PayPal\Rest\ApiContext;
  * @license http://www.gnu.org/licenses/agpl-3.0
  * @link    http://fusio-project.org
  */
-class PaypalTest extends \PHPUnit_Framework_TestCase
+class PaypalTest extends TestCase
 {
     use EngineTestCaseTrait;
 
