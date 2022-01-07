@@ -3,7 +3,7 @@
  * Fusio
  * A web-application to create dynamically RESTful APIs
  *
- * Copyright (C) 2015-2018 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (C) 2015-2022 Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -35,14 +35,11 @@ use PSX\Http\Exception as StatusCode;
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.gnu.org/licenses/agpl-3.0
- * @link    http://fusio-project.org
+ * @link    https://www.fusio-project.org/
  */
 class Paypal implements ProviderInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function prepare($connection, ProductInterface $product, TransactionInterface $transaction, PrepareContext $context)
+    public function prepare(mixed $connection, ProductInterface $product, TransactionInterface $transaction, PrepareContext $context): string
     {
         $apiContext = $this->getApiContext($connection);
 
@@ -56,10 +53,7 @@ class Paypal implements ProviderInterface
         return $payment->getApprovalLink();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function execute($connection, ProductInterface $product, TransactionInterface $transaction, ParametersInterface $parameters)
+    public function execute(mixed $connection, ProductInterface $product, TransactionInterface $transaction, ParametersInterface $parameters): void
     {
         $apiContext = $this->getApiContext($connection);
 
@@ -75,11 +69,7 @@ class Paypal implements ProviderInterface
         $this->updateTransaction($payment, $transaction);
     }
 
-    /**
-     * @param mixed $connection
-     * @return \PayPal\Rest\ApiContext
-     */
-    private function getApiContext($connection)
+    private function getApiContext(mixed $connection): ApiContext
     {
         if ($connection instanceof ApiContext) {
             return $connection;
@@ -88,12 +78,7 @@ class Paypal implements ProviderInterface
         }
     }
 
-    /**
-     * @param \Fusio\Engine\Model\ProductInterface $product
-     * @param \Fusio\Engine\Payment\PrepareContext $context
-     * @return \PayPal\Api\Payment
-     */
-    private function createPayment(ProductInterface $product, PrepareContext $context)
+    private function createPayment(ProductInterface $product, PrepareContext $context): Api\Payment
     {
         $payer = new Api\Payer();
         $payer->setPaymentMethod('paypal');
@@ -129,21 +114,13 @@ class Paypal implements ProviderInterface
         return $payment;
     }
 
-    /**
-     * @param \PayPal\Api\Payment $payment
-     * @param \Fusio\Engine\Model\TransactionInterface $transaction
-     */
-    private function updateTransaction(Api\Payment $payment, TransactionInterface $transaction)
+    private function updateTransaction(Api\Payment $payment, TransactionInterface $transaction): void
     {
         $transaction->setStatus($this->getTransactionStatus($payment));
         $transaction->setRemoteId($payment->getId());
     }
 
-    /**
-     * @param \PayPal\Api\Payment $payment
-     * @return integer
-     */
-    private function getTransactionStatus(Api\Payment $payment)
+    private function getTransactionStatus(Api\Payment $payment): int
     {
         if ($payment->getState() == 'created') {
             return TransactionInterface::STATUS_CREATED;
