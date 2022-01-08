@@ -67,7 +67,7 @@ class PaypalTest extends TestCase
 
         $this->assertInstanceOf(Container::class, $builder->getForm());
 
-        $elements = $builder->getForm()->getProperty('element');
+        $elements = $builder->getForm()->getElements();
         $this->assertEquals(4, count($elements));
         $this->assertInstanceOf(Select::class, $elements[0]);
         $this->assertInstanceOf(Input::class, $elements[1]);
