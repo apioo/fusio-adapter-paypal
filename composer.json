@@ -2,7 +2,6 @@
   "name": "fusio/adapter-paypal",
   "description": "Provides connections to work with the Paypal API",
   "homepage": "https://www.fusio-project.org",
-  "keywords": ["fusio-adapter"],
   "license": "AGPL-3.0",
   "authors": [
     {
